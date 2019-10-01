@@ -13,6 +13,13 @@ SHOW_EVERY = 2000
 DISCRETE_OS_SIZE = [20] * len(env.observation_space.high)
 discrete_os_win_size = (env.observation_space.high - env.observation_space.low) / DISCRETE_OS_SIZE
 
+
+epsilon = 0.5
+START_EPSILON_DECAYING = 1
+END_EPSILON_DECAYING = EPISODES // 2
+
+epsilon_decay_value = epsilon/(END_EPSILON_DECAYING - START_EPSILON_DECAYING)
+
 q_table = np.random.uniform(low=-2, high=0, size=(DISCRETE_OS_SIZE + [env.action_space.n]))
 
 def get_discrete_state(state):
@@ -49,5 +56,8 @@ for episode in range(EPISODES):
             q_table[discrete_state + (action, )] = 0
 
         discrete_state = new_discrete_state
+
+    if END_EPSILON_DECAYING >= episode >= START_EPSILON_DECAYING:
+        epsilon -= epsilon_decay_value
 
 env.close()
